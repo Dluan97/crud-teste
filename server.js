@@ -35,13 +35,16 @@ app.get("/projetos/:id", (req, res) => {
 // POST /projetos -> cria novo
 
 app.post("/projetos", (req, res) => {
-    const { titulo, descricao, imagem } = req.body;
-    if (!titulo) return res.status(400).json({ error: "Campo 'titulo' é obrigatório. "});
+    const { titulo, descricao, link } = req.body;
+    if (!titulo) 
+        return res.status(400).json({ error: "Campo 'titulo' é obrigatório. "});
 
-    const sql = "INSERT INTO projetos (titulo, descricao, imagem) VALUES (?, ?, ?)";
-    db.run(sql [titulo, descricao || "", imagem || ""], function (err) {
-        if (err) return res.status(500).json({error: err.message });
-        res.status(201).json({ id: this.lastID, titulo, descricao, imagem});
+    const sql = "INSERT INTO projetos (titulo, descricao, link) VALUES (?, ?, ?)";
+    db.run(sql [titulo, descricao, link], function (err) {
+        if (err)
+            console.error(err);
+         return res.status(500).json({error: err.message });
+        res.status(201).json({ id: this.lastID, titulo, descricao, link});
     });
 });
 
@@ -49,14 +52,14 @@ app.post("/projetos", (req, res) => {
 
 app.put("/projetos/:id", (req, res) => {
     const { id } = req.params;
-    const { titulo, descricao, imagem } = req.body;
+    const { titulo, descricao, link } = req.body;
     if (!titulo) return res.status(400).json({ error: "Campo 'titulo' é obrigatório."});
 
-    const sql = "UPDATE projetos SET titulo = ?, descricao = ? imagem = ? WHERE id = ?";
-    db.run(sql, [titulo, descricao || "", imagem || "", id], function (err) {
+    const sql = "UPDATE projetos SET titulo = ?, descricao = ? link = ? WHERE id = ?";
+    db.run(sql, [titulo, descricao, link, id], function (err) {
         if (err) return res.status(500).json({ error: err.message });
         if (this.changes === 0) return res.status(404).json({ error: "Projeto não encontrado"});
-        res.json({ id, titulo, descricao, imagem});
+        res.json({ id, titulo, descricao, link});
     })
 });
 
