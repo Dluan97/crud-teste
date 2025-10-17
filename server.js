@@ -77,7 +77,7 @@ app.put("/projetos/:id", (req, res) => {
     const { titulo, descricao, link } = req.body;
     if (!titulo) return res.status(400).json({ error: "Campo 'titulo' é obrigatório."});
 
-    const sql = "UPDATE projetos SET titulo = ?, descricao = ?, link, = ? WHERE id = ?";
+    const sql = "UPDATE projetos SET titulo = ?, descricao = ?, link = ? WHERE id = ?";
     db.run(sql, [titulo, descricao, link, id], function (err) {
         if (err) return res.status(500).json({ error: err});
         if (this.changes === 0) return res.status(404).json({ error: "Projeto não encontrado"});
