@@ -1,5 +1,6 @@
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("./db/database.sqlite");
+// connection.js
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./db/database.sqlite');
 
 db.serialize(() => {
     db.run(`
@@ -7,7 +8,7 @@ db.serialize(() => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
             descricao TEXT,
-            imagem TEXT
+            link TEXT
         )
     `);
 });

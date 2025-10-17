@@ -35,17 +35,39 @@ app.get("/projetos/:id", (req, res) => {
 // POST /projetos -> cria novo
 
 app.post("/projetos", (req, res) => {
+  try {
     const { titulo, descricao, link } = req.body;
-    if (!titulo) 
-        return res.status(400).json({ error: "Campo 'titulo' é obrigatório. "});
+
+    // Validação simples
+    if (!titulo) {
+      console.warn("⚠️ Campo 'titulo' ausente no corpo da requisição.");
+      return res.status(400).json({ error: "Campo 'titulo' é obrigatório." });
+    }
 
     const sql = "INSERT INTO projetos (titulo, descricao, link) VALUES (?, ?, ?)";
-    db.run(sql [titulo, descricao, link], function (err) {
-        if (err)
-            console.error(err);
-         return res.status(500).json({error: err.message });
-        res.status(201).json({ id: this.lastID, titulo, descricao, link});
+    console.log("🟡 Executando INSERT:", sql);
+
+    db.run(sql, [titulo, descricao, link], function (err) {
+      console.log("📘 Callback executado do db.run");
+
+      if (err) {
+        console.error("❌ Erro no INSERT:", err.message);
+        return res.status(500).json({ error: err.message });
+      }
+
+      console.log("✅ Projeto inserido com sucesso. ID:", this.lastID);
+
+      res.status(201).json({
+        id: this.lastID,
+        titulo,
+        descricao,
+        link,
+      });
     });
+  } catch (err) {
+    console.error("💥 Erro inesperado na rota POST /projetos:", err);
+    res.status(500).json({ error: "Erro inesperado no servidor." });
+  }
 });
 
 // PUT /projetos/:id -> atualizar
@@ -55,9 +77,9 @@ app.put("/projetos/:id", (req, res) => {
     const { titulo, descricao, link } = req.body;
     if (!titulo) return res.status(400).json({ error: "Campo 'titulo' é obrigatório."});
 
-    const sql = "UPDATE projetos SET titulo = ?, descricao = ? link = ? WHERE id = ?";
+    const sql = "UPDATE projetos SET titulo = ?, descricao = ?, link, = ? WHERE id = ?";
     db.run(sql, [titulo, descricao, link, id], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return res.status(500).json({ error: err});
         if (this.changes === 0) return res.status(404).json({ error: "Projeto não encontrado"});
         res.json({ id, titulo, descricao, link});
     })
@@ -80,16 +102,3 @@ app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
 
-// ROTA GET - Listar todos os projetos
-app.get("/projetos", (req, res) => {
-    const sql = "SELECT * FROM projetos";
-
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            console.error(err);
-            res.status(500).json({error: "Erro ao buscar projetos"});
-        } else {
-            res.json(rows);
-        }
-    });
-});
